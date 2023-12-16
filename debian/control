@@ -3,30 +3,76 @@ Section: misc
 Priority: optional
 Maintainer: Proxmox Support Team <support@proxmox.com>
 Build-Depends: bc,
- debhelper-compat (= 12),
- dosfstools,
- dpkg (>= 1.19.3),
- gcc-aarch64-linux-gnu,
- gcc-multilib [i386],
- iasl,
- mtools,
- nasm,
- python3,
- python3-distutils,
- python3-pexpect,
- qemu-utils,
- pve-qemu-kvm | qemu-system-x86 (>= 1:2.12+dfsg),
- uuid-dev,
- xorriso,
+               debhelper-compat (= 12),
+               dosfstools,
+               dpkg (>= 1.19.3),
+               gcc-aarch64-linux-gnu,
+               gcc-multilib [i386],
+               gcc-riscv64-linux-gnu,
+               iasl,
+               mtools,
+               nasm,
+               pve-qemu-kvm | qemu-system-arm (>= 1:2.12+dfsg),
+               pve-qemu-kvm | qemu-system-x86 (>= 1:2.12+dfsg),
+               python3,
+               python3-distutils,
+               python3-pexpect,
+               qemu-utils,
+               uuid-dev,
+               xorriso,
 Standards-Version: 4.5.0
 Homepage: http://www.tianocore.org
 XS-Build-Indep-Architecture: amd64
 
 Package: pve-edk2-firmware
 Architecture: all
-Depends: ${misc:Depends}
+Depends: pve-edk2-firmware-legacy, pve-edk2-firmware-ovmf, ${misc:Depends},
 Multi-Arch: foreign
 Description: edk2 based UEFI firmware modules for virtual machines
  Open Virtual Machine Firmware is a build of EDK II for 64-bit, 32-bit x86
- and 64-bit ARM virtual machines. It includes full support for UEFI, including
- Secure Boot, allowing use of UEFI in place of a traditional BIOS in your VM.
+ virtual machines. It includes full support for UEFI, including Secure Boot,
+ allowing use of UEFI in place of a traditional BIOS in your VM.
+ Meta package depending on OVMF and Legacy OVMF images to ease the upgrade
+ transition.
+
+Package: pve-edk2-firmware-ovmf
+Architecture: all
+Depends: ${misc:Depends},
+Breaks: pve-edk2-firmware (<< 4.2023.08-1),
+Multi-Arch: foreign
+Description: edk2 based UEFI firmware modules for virtual machines
+ Open Virtual Machine Firmware is a build of EDK II for 64-bit, 32-bit x86
+ virtual machines. It includes full support for UEFI, including Secure Boot,
+ allowing use of UEFI in place of a traditional BIOS in your VM.
+
+Package: pve-edk2-firmware-aarch64
+Architecture: all
+Depends: ${misc:Depends},
+Breaks: pve-edk2-firmware (<< 4.2023.08-1),
+Multi-Arch: foreign
+Description: edk2 based ARM64 UEFI firmware modules for virtual machines
+ A build of EDK II for 64-bit ARM virtual machines. It includes full support
+ for UEFI, including Secure Boot, allowing use of UEFI in place of a
+ traditional BIOS in your VM.
+
+Package: pve-edk2-firmware-riscv
+Architecture: all
+Depends: ${misc:Depends},
+Multi-Arch: foreign
+Description: edk2 based RISC-V UEFI firmware modules for virtual machines
+ A build of EDK II for 64-bit RISC-V virtual machines. It includes full support
+ for UEFI, including Secure Boot, allowing use of UEFI in place of a
+ traditional BIOS in your VM.
+
+Package: pve-edk2-firmware-legacy
+Architecture: all
+Depends: ${misc:Depends},
+Breaks: pve-edk2-firmware (<< 4.2023.08-1),
+Multi-Arch: foreign
+Description: edk2 based legacy 2MB UEFI firmware modules for virtual machines
+ Open Virtual Machine Firmware is a build of EDK II for 64-bit, 32-bit x86
+ virtual machines. It includes full support for UEFI, including Secure Boot,
+ allowing use of UEFI in place of a traditional BIOS in your VM.
+ This packages includes a static build of legacy images that got dropped from
+ upstream because the small size results in to many limitations, but Proxmox VE
+ still needs to provide backward compat for older VMs.
