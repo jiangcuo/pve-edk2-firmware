@@ -9,7 +9,7 @@ Last-Update: 2023-07-21
 
 --- a/ArmVirtPkg/ArmVirt.dsc.inc
 +++ b/ArmVirtPkg/ArmVirt.dsc.inc
-@@ -365,7 +365,7 @@
+@@ -383,7 +383,7 @@
    # reserved ones, with the exception of LoaderData regions, of which OS loaders
    # (i.e., GRUB) may assume that its contents are executable.
    #

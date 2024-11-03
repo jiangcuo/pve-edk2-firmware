@@ -3,5 +3,11 @@ brotlicompress-disable.diff
 x64-baseline-abi.patch
 Revert-ArmVirtPkg-make-EFI_LOADER_DATA-non-executabl.patch
 ArmVirtPkg-disable-the-EFI_MEMORY_ATTRIBUTE-protocol.patch
-CVE-2023-45229_45237.patch
-CVE-2023-48733-Disable-the-Shell-when-SecureBoot-is-enabled.patch
+mbedtls-disable.diff
+0001-MdePkg-BaseLib-RISC-V-Add-FPU-CSR-constants.patch
+0002-UefiCpuPkg-RiscV64-initialize-FPU.patch
+0003-OvmfPkg-RiscV64-build-BaseRiscVFpuLib.patch
+0001-MdePkg-Fix-overflow-issue-in-BasePeCoffLib.patch
+0002-MdePkg-Improving-readability-of-CVE-patch-for-PeCoff.patch
+0001-Avoid-type-errors-in-EAI-related-name-check-logic.patch
+0005-Change-build-DEF-to-ENV.patch

@@ -8,6 +8,9 @@ BUILD_TYPE ?= RELEASE
 EDK2_TOOLCHAIN = GCC5
 export $(EDK2_TOOLCHAIN)_AARCH64_PREFIX=aarch64-linux-gnu-
 export $(EDK2_TOOLCHAIN)_RISCV64_PREFIX=riscv64-linux-gnu-
+export $(EDK2_TOOLCHAIN)_X64_PREFIX=x86_64-linux-gnu-
+export $(EDK2_TOOLCHAIN)_IA32_PREFIX=i686-linux-gnu-
+export $(EDK2_TOOLCHAIN)_LOONGARCH64_PREFIX=loongarch64-unknown-linux-gnu-
 
 export PYTHON3_ENABLE=TRUE
 
@@ -19,6 +22,9 @@ ifeq ($(DEB_BUILD_ARCH),i386)
 endif
 ifeq ($(DEB_BUILD_ARCH),arm64)
 	EDK2_BUILD_ARCH=AARCH64
+endif
+ifeq ($(DEB_BUILD_ARCH),loongarch64)
+	EDK2_BUILD_ARCH=LOONGARCH64
 endif
 
 PCD_RELEASE_DATE = $(shell date -d@$(SOURCE_DATE_EPOCH) "+%m/%d/%Y")
@@ -44,6 +50,7 @@ AAVMF_FLAGS += -DTPM2_CONFIG_ENABLE=TRUE
 AAVMF_FLAGS += -DCAVIUM_ERRATUM_27456=TRUE
 
 RISCV64_FLAGS = $(COMMON_FLAGS)
+LOONGARCH64_FLAGS = $(COMMON_FLAGS)
 
 # Clear variables used internally by the edk2 build system
 undefine WORKSPACE
@@ -180,11 +187,6 @@ debian/oem-string-%: debian/PkKek-1-%.pem
 		--no-default \
 		-C `< debian/oem-string-snakeoil` -o $@
 
-ArmPkg/Library/GccLto/liblto-aarch64.a:	ArmPkg/Library/GccLto/liblto-aarch64.s
-	$($(EDK2_TOOLCHAIN)_AARCH64_PREFIX)gcc -c -fpic $< -o $@
-
-ArmPkg/Library/GccLto/liblto-arm.a: ArmPkg/Library/GccLto/liblto-arm.s
-	$($(EDK2_TOOLCHAIN)_ARM_PREFIX)gcc -c -fpic $< -o $@
 
 build-qemu-efi: debian/setup-build-stamp
 	set -e; . ./edksetup.sh; \
@@ -202,7 +204,7 @@ build-qemu-efi: debian/setup-build-stamp
 	truncate -s 64M $(QEMU_EFI_BUILD_DIR)/FV/$(FW_NAME)_VARS.fd
 
 build-qemu-efi-aarch64: $(AAVMF_BINARIES) $(AAVMF_IMAGES) $(AAVMF_PREENROLLED_VARS)
-$(AAVMF_BINARIES) $(AAVMF_IMAGES): ArmPkg/Library/GccLto/liblto-aarch64.a
+$(AAVMF_BINARIES) $(AAVMF_IMAGES):
 	$(MAKE) -f debian/rules build-qemu-efi EDK2_ARCH_DIR=AArch64 EDK2_HOST_ARCH=AARCH64 FW_NAME=AAVMF
 
 build-qemu-efi-riscv64:  $(RISCV64_IMAGES)
@@ -218,6 +220,7 @@ $(RISCV64_IMAGES): debian/setup-build-stamp
 override_dh_auto_clean:
 	-. ./edksetup.sh; build clean
 	make -C BaseTools clean
+	echo ok
 
 # Only embed code that is actually used; requested by the Ubuntu Security Team
 EMBEDDED_SUBMODULES += CryptoPkg/Library/OpensslLib/openssl

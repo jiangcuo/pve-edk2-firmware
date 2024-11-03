@@ -1,3 +1,9 @@
+pve-edk2-firmware (4.2024.08-1) port; urgency=medium
+
+  * Update to 4.2024.08-1
+
+ -- Jiangcuo <jiangcuo@bingsin.com>  Sun, 03 Nov 2024 23:31:47 +0800
+
 pve-edk2-firmware (4.2023.08-4) bookworm; urgency=medium
 
   * fix CVE-2023-48733: disable EFI shell in SB mode
