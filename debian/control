@@ -66,6 +66,13 @@ Description: edk2 based RISC-V UEFI firmware modules for virtual machines
  for UEFI, including Secure Boot, allowing use of UEFI in place of a
  traditional BIOS in your VM.
 
+Package: pve-edk2-firmware-loongarch64
+Architecture: all
+Depends: ${misc:Depends},
+Multi-Arch: foreign
+Description: edk2 based loongarch64 UEFI firmware modules for virtual machines
+ A build of EDK II for 64-bit loongarch virtual machines. 
+
 Package: pve-edk2-firmware-legacy
 Architecture: all
 Depends: ${misc:Depends},

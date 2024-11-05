@@ -1,0 +1,2 @@
+Build/LoongArchVirtQemu/RELEASE_*GCC*/FV/QEMU_EFI.fd /usr/share/pve-edk2-firmware/LOONGARCH64
+Build/LoongArchVirtQemu/RELEASE_*GCC*/FV/QEMU_VARS.fd /usr/share/pve-edk2-firmware/LOONGARCH64

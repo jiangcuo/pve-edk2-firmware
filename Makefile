@@ -13,8 +13,9 @@ VIRTUAL_DEB = $(PACKAGE)_$(DEB_VERSION)_all.deb
 AMD64_DEB = $(PACKAGE)-legacy_$(DEB_VERSION)_all.deb $(PACKAGE)-ovmf_$(DEB_VERSION)_all.deb
 AARCH64_DEB = $(PACKAGE)-aarch64_$(DEB_VERSION)_all.deb
 RISCV_DEB = $(PACKAGE)-riscv_$(DEB_VERSION)_all.deb
+LOONGARCH64_DEB = $(PACKAGE)-loongarch64_$(DEB_VERSION)_all.deb
 
-DEBS = $(VIRTUAL_DEB) $(AMD64_DEB) $(AARCH64_DEB) $(RISCV_DEB)
+DEBS = $(VIRTUAL_DEB) $(AMD64_DEB) $(AARCH64_DEB) $(RISCV_DEB) $(LOONGARCH64_DEB)
 
 all: $(DEBS)
 	@echo $(DEBS)
@@ -29,7 +30,7 @@ $(BUILDDIR): $(SRCDIR)/Readme.md
 
 .PHONY: deb
 deb: $(DEBS)
-$(AMD64_DEB) $(AARCH64_DEB) $(RISCV_DEB): $(VIRTUAL_DEB)
+$(AMD64_DEB) $(AARCH64_DEB) $(RISCV_DEB) $(LOONGARCH64_DEB): $(VIRTUAL_DEB)
 $(VIRTUAL_DEB): $(BUILDDIR)
 	cd $(BUILDDIR); dpkg-buildpackage -b -uc -us
 	lintian $(DEBS)

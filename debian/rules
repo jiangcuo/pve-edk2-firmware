@@ -28,7 +28,7 @@ ifeq ($(DEB_BUILD_ARCH),loongarch64)
 endif
 
 PCD_RELEASE_DATE = $(shell date -d@$(SOURCE_DATE_EPOCH) "+%m/%d/%Y")
-PCD_FLAGS  = --pcd PcdFirmwareVendor=L"Proxmox distribution of EDK II\\0"
+PCD_FLAGS  = --pcd PcdFirmwareVendor=L"Proxmox Port distribution of EDK II\\0"
 PCD_FLAGS += --pcd PcdFirmwareVersionString=L"$(DEB_VERSION)\\0"
 PCD_FLAGS += --pcd PcdFirmwareReleaseDateString=L"$(PCD_RELEASE_DATE)\\0"
 COMMON_FLAGS  = -DNETWORK_HTTP_BOOT_ENABLE=TRUE
@@ -50,7 +50,9 @@ AAVMF_FLAGS += -DTPM2_CONFIG_ENABLE=TRUE
 AAVMF_FLAGS += -DCAVIUM_ERRATUM_27456=TRUE
 
 RISCV64_FLAGS = $(COMMON_FLAGS)
-LOONGARCH64_FLAGS = $(COMMON_FLAGS)
+LOONGARCH64_FLAGS = -DNETWORK_HTTP_BOOT_ENABLE=TRUE
+LOONGARCH64_FLAGS += -DSECURE_BOOT_ENABLE=TRUE
+LOONGARCH64_FLAGS += -DNETWORK_IP6_ENABLE=TRUE
 
 # Clear variables used internally by the edk2 build system
 undefine WORKSPACE
@@ -63,7 +65,7 @@ undefine CONF_PATH
 %:
 	dh $@
 
-override_dh_auto_build: build-qemu-efi-aarch64 build-ovmf build-ovmf32 build-qemu-efi-riscv64
+override_dh_auto_build: build-qemu-efi-aarch64 build-ovmf build-ovmf32 build-qemu-efi-riscv64 build-qemu-efi-loongarch64
 
 debian/setup-build-stamp:
 	cp -a debian/Logo.bmp MdeModulePkg/Logo/Logo.bmp
@@ -98,6 +100,10 @@ AAVMF_PREENROLLED_VARS = $(addprefix $(AAVMF_BUILD_DIR)/FV/,AAVMF_VARS.ms.fd AAV
 
 RISCV64_BUILD_DIR = Build/RiscVVirtQemu/$(BUILD_TYPE)_$(EDK2_TOOLCHAIN)
 RISCV64_IMAGES    = $(addprefix $(RISCV64_BUILD_DIR)/FV/,RISCV_VIRT_CODE.fd RISCV_VIRT_VARS.fd)
+
+
+LOONGARCH64_BUILD_DIR = Build/LoongArchVirtQemu/$(BUILD_TYPE)_$(EDK2_TOOLCHAIN)
+LOONGARCH64_IMAGES    = $(addprefix $(LOONGARCH64_BUILD_DIR)/FV/,QEMU_EFI.fd QEMU_VARS.fd)
 
 build-ovmf32: $(OVMF32_BINARIES) $(OVMF32_IMAGES)
 $(OVMF32_BINARIES) $(OVMF32_IMAGES): debian/setup-build-stamp
@@ -217,6 +223,14 @@ $(RISCV64_IMAGES): debian/setup-build-stamp
 	truncate -s 32M $(RISCV64_BUILD_DIR)/FV/RISCV_VIRT_CODE.fd
 	truncate -s 32M $(RISCV64_BUILD_DIR)/FV/RISCV_VIRT_VARS.fd
 
+build-qemu-efi-loongarch64:  $(LOONGARCH64_IMAGES)
+$(LOONGARCH64_IMAGES): debian/setup-build-stamp
+	set -e; . ./edksetup.sh; \
+		build -a LOONGARCH64 \
+			-t $(EDK2_TOOLCHAIN) \
+			-p OvmfPkg/LoongArchVirt/LoongArchVirtQemu.dsc \
+			$(LOONGARCH64_FLAGS) -b $(BUILD_TYPE)
+
 override_dh_auto_clean:
 	-. ./edksetup.sh; build clean
 	make -C BaseTools clean
@@ -253,4 +267,4 @@ get-orig-source:
 		edk2-$(DEB_VERSION_UPSTREAM)
 	rm -rf edk2.tmp edk2-$(DEB_VERSION_UPSTREAM)
 
-.PHONY: build-ovmf build-ovmf32 build-qemu-efi build-qemu-efi-aarch64 build-qemu-efi-riscv64
+.PHONY: build-ovmf build-ovmf32 build-qemu-efi build-qemu-efi-aarch64 build-qemu-efi-riscv64 build-qemu-efi-loongarch64
