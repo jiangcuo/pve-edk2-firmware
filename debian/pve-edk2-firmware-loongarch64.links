@@ -1,2 +1,2 @@
-/usr/share/pve-edk2-firmware/LOONGARCH64/QEMU_EFI.fd /usr/share/pve-edk2-firmware/LOONGARCH64_VIRT_CODE.fd
-/usr/share/pve-edk2-firmware/LOONGARCH64/QEMU_VARS.fd /usr/share/pve-edk2-firmware/LOONGARCH64_VIRT_VARS.fd
+/usr/share/pve-edk2-firmware/LOONGARCH/QEMU_EFI.fd /usr/share/pve-edk2-firmware/LOONGARCH64_VIRT_CODE.fd
+/usr/share/pve-edk2-firmware/LOONGARCH/QEMU_VARS.fd /usr/share/pve-edk2-firmware/LOONGARCH64_VIRT_VARS.fd
