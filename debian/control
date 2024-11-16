@@ -28,7 +28,7 @@ XS-Build-Indep-Architecture: amd64
 
 Package: pve-edk2-firmware
 Architecture: all
-Depends: pve-edk2-firmware-legacy, pve-edk2-firmware-ovmf, ${misc:Depends},
+Depends: pve-edk2-firmware-legacy, pve-edk2-firmware-ovmf, pve-edk2-firmware-aarch64 ,pve-edk2-firmware-riscv ,pve-edk2-firmware-loongarch64 , ${misc:Depends},
 Multi-Arch: foreign
 Description: edk2 based UEFI firmware modules for virtual machines
  Open Virtual Machine Firmware is a build of EDK II for 64-bit, 32-bit x86

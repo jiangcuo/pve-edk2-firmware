@@ -1,4 +1,4 @@
-pve-edk2-firmware (4.2024.11) port; urgency=medium
+pve-edk2-firmware (4.2024.11-1) port; urgency=medium
 
   * Update edk2 to 836942fbadb629050b866a8052e6af755bcdf623, fix loongarch guestos reboot hang
 
