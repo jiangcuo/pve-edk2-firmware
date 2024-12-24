@@ -1,3 +1,11 @@
+pve-edk2-firmware (4.2024.08-2) port; urgency=medium
+
+  * Update to 4.2024.08-2 Release Date 2024-11-06
+  
+  * fix aarch64 mission file
+
+ -- Jiangcuo <jiangcuo@lierfang.com>  Tue, 24 Dec 2024 11:40:13 +0800
+
 pve-edk2-firmware (4.2024.08-1) port; urgency=medium
 
   * Update to 4.2024.08-1
