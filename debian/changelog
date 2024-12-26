@@ -1,3 +1,9 @@
+pve-edk2-firmware (4.2024.11-3) port; urgency=medium
+
+  * switch stable version
+
+ -- Jiangcuo <jiangcuo@lierfang.com>  Thu, 26 Dec 2024 17:21:58 +0800
+
 pve-edk2-firmware (4.2024.11-2) port; urgency=medium
 
   * fix aarch64 mission files

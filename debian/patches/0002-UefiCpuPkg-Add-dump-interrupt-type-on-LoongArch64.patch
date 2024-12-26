@@ -1,0 +1,126 @@
+From 2ece0790f7c23292bb29a0f8008d7fac947852ea Mon Sep 17 00:00:00 2001
+From: Chao Li <lichao@loongson.cn>
+Date: Wed, 18 Dec 2024 11:27:10 +0800
+Subject: [PATCH 2/3] UefiCpuPkg: Add dump interrupt type on LoongArch64
+
+If the exception type is INT, we need to know which interrupt could not
+be handled, so we added a method to dump them.
+
+Cc: Ray Ni <ray.ni@intel.com>
+Cc: Jiaxin Wu <jiaxin.wu@intel.com>
+Cc: Zhiguang Liu <zhiguang.liu@intel.com>
+Cc: Dun Tan <dun.tan@intel.com>
+Cc: Rahul Kumar <rahul1.kumar@intel.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Jiaxin Wu <jiaxin.wu@intel.com>
+Signed-off-by: Chao Li <lichao@loongson.cn>
+---
+ .../LoongArch/ExceptionCommon.c               | 36 +++++++++++++++++++
+ .../LoongArch/ExceptionCommon.h               | 14 ++++++++
+ .../LoongArch64/ArchExceptionHandler.c        | 11 ++++++
+ 3 files changed, 61 insertions(+)
+
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/ExceptionCommon.c
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/ExceptionCommon.c
+@@ -43,8 +43,24 @@
+   "#GCXC - Guest CSR Software/Hardware Change exception",
+   "#TBR - TLB refill exception" // !!! NOTICE: Because the TLB refill exception is not instructed in ECODE, so the TLB refill exception must be the last one!
+ };
++CONST CHAR8  *mInterruptNameStr[] = {
++  "#SIP0 - Software interrupt 0",
++  "#SIP1 - Software interrupt 1",
++  "#IP0 - Hardware interrupt 0",
++  "#IP1 - Hardware interrupt 1",
++  "#IP2 - Hardware interrupt 2",
++  "#IP3 - Hardware interrupt 3",
++  "#IP4 - Hardware interrupt 4",
++  "#IP5 - Hardware interrupt 5",
++  "#IP6 - Hardware interrupt 6",
++  "#IP7 - Hardware interrupt 7",
++  "#PMC - Performance counter overflow interrupt",
++  "#TIMER - Timer interrupt",
++  "#IPI - Inter-Processor interrupt"
++};
+ 
+ INTN  mExceptionKnownNameNum = (sizeof (mExceptionNameStr) / sizeof (CHAR8 *));
++INTN  mInterruptKnownNameNum = (sizeof (mInterruptNameStr) / sizeof (CHAR8 *));
+ 
+ /**
+   Get ASCII format string exception name by exception type.
+@@ -64,6 +80,26 @@
+   } else {
+     return mExceptionReservedStr;
+   }
++}
++
++/**
++  Get ASCII format string interrupt name by exception type.
++
++  @param InterruptType  Interrupt type.
++
++  @return  ASCII format string interrupt name.
++
++**/
++CONST CHAR8 *
++GetInterruptNameStr (
++  IN EFI_EXCEPTION_TYPE  InterruptType
++  )
++{
++  if ((UINTN)InterruptType < mInterruptKnownNameNum) {
++    return mInterruptNameStr[InterruptType];
++  } else {
++    return mExceptionReservedStr;
++  }
+ }
+ 
+ /**
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/ExceptionCommon.h
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/ExceptionCommon.h
+@@ -20,6 +20,7 @@
+ #define MAX_LOONGARCH_EXCEPTION  64
+ 
+ extern INTN  mExceptionKnownNameNum;
++extern INTN  mInterruptKnownNameNum;
+ 
+ /**
+   Get ASCII format string exception name by exception type.
+@@ -35,6 +36,19 @@
+   );
+ 
+ /**
++  Get ASCII format string interrupt name by exception type.
++
++  @param InterruptType  Interrupt type.
++
++  @return  ASCII format string interrupt name.
++
++**/
++CONST CHAR8 *
++GetInterruptNameStr (
++  IN EFI_EXCEPTION_TYPE  InterruptType
++  );
++
++/**
+   Prints a message to the serial port.
+ 
+   @param[in]  Format      Format string for the message to print.
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/LoongArch64/ArchExceptionHandler.c
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/LoongArch64/ArchExceptionHandler.c
+@@ -96,6 +96,17 @@
+     );
+ 
+   //
++  // Dump interrupt type if the exception type is INT.
++  //
++  if (ExceptionType == EXCEPT_LOONGARCH_INT) {
++    InternalPrintMessage (
++      "\n!!!! Unhandled interrupt Type - %02x(%a) !!!!\n",
++      GetInterruptType (SystemContext),
++      GetInterruptNameStr (GetInterruptType (SystemContext))
++      );
++  }
++
++  //
+   // Dump TLB refill ERA and BADV
+   //
+   if (ExceptionType == (mExceptionKnownNameNum - 1)) {

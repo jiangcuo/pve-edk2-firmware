@@ -1,0 +1,85 @@
+From 0fdffb71df7c99301c6430a95af207159cbe9655 Mon Sep 17 00:00:00 2001
+From: Chao Li <lichao@loongson.cn>
+Date: Wed, 18 Dec 2024 10:45:24 +0800
+Subject: [PATCH 1/3] UefiCpuPkg: Adjust the exception handler logic on
+ LoongArch64
+
+There is a problem with LoongArch64 exception handler, it returns a
+unhandled value when we get an exception type, the correct value should
+be right shifted 16 bits, so fix it.
+
+Cc: Ray Ni <ray.ni@intel.com>
+Cc: Jiaxin Wu <jiaxin.wu@intel.com>
+Cc: Zhiguang Liu <zhiguang.liu@intel.com>
+Cc: Dun Tan <dun.tan@intel.com>
+Cc: Rahul Kumar <rahul1.kumar@intel.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Jiaxin Wu <jiaxin.wu@intel.com>
+Signed-off-by: Chao Li <lichao@loongson.cn>
+---
+ .../LoongArch/DxeExceptionLib.c                   | 15 +++++++--------
+ .../LoongArch/LoongArch64/ArchExceptionHandler.c  |  2 +-
+ .../LoongArch/SecPeiExceptionLib.c                |  7 -------
+ 3 files changed, 8 insertions(+), 16 deletions(-)
+
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/DxeExceptionLib.c
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/DxeExceptionLib.c
+@@ -115,23 +115,22 @@
+     // Interrupt
+     //
+     InterruptType = GetInterruptType (SystemContext);
+-    if (InterruptType == 0xFF) {
+-      ExceptionType = InterruptType;
+-    } else {
++    if (InterruptType != 0xFF) {
+       if ((ExternalInterruptHandler != NULL) && (ExternalInterruptHandler[InterruptType] != NULL)) {
+         ExternalInterruptHandler[InterruptType](InterruptType, SystemContext);
+         return;
+       }
+     }
+-  } else if (ExceptionType == EXCEPT_LOONGARCH_FPD) {
+-    EnableFloatingPointUnits ();
+-    InitializeFloatingPointUnits ();
+-    return;
+   } else {
+     //
+     // Exception
+     //
+-    ExceptionType >>= CSR_ESTAT_EXC_SHIFT;
++    if (ExceptionType == EXCEPT_LOONGARCH_FPD) {
++      EnableFloatingPointUnits ();
++      InitializeFloatingPointUnits ();
++      return;
++    }
++
+     if ((ExceptionHandler != NULL) && (ExceptionHandler[ExceptionType] != NULL)) {
+       ExceptionHandler[ExceptionType](ExceptionType, SystemContext);
+       return;
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/LoongArch64/ArchExceptionHandler.c
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/LoongArch64/ArchExceptionHandler.c
+@@ -27,7 +27,7 @@
+ {
+   EFI_EXCEPTION_TYPE  ExceptionType;
+ 
+-  ExceptionType = (SystemContext.SystemContextLoongArch64->ESTAT & CSR_ESTAT_EXC);
++  ExceptionType = (SystemContext.SystemContextLoongArch64->ESTAT & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
+   return ExceptionType;
+ }
+ 
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/SecPeiExceptionLib.c
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/LoongArch/SecPeiExceptionLib.c
+@@ -68,14 +68,7 @@
+       //
+       IpiInterruptHandler (InterruptType, SystemContext);
+       return;
+-    } else {
+-      ExceptionType = InterruptType;
+     }
+-  } else {
+-    //
+-    // Exception
+-    //
+-    ExceptionType >>= CSR_ESTAT_EXC_SHIFT;
+   }
+ 
+   DefaultExceptionHandler (ExceptionType, SystemContext);

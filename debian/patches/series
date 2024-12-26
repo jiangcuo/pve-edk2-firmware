@@ -3,11 +3,7 @@ brotlicompress-disable.diff
 x64-baseline-abi.patch
 Revert-ArmVirtPkg-make-EFI_LOADER_DATA-non-executabl.patch
 ArmVirtPkg-disable-the-EFI_MEMORY_ATTRIBUTE-protocol.patch
-mbedtls-disable.diff
-0001-MdePkg-BaseLib-RISC-V-Add-FPU-CSR-constants.patch
-0002-UefiCpuPkg-RiscV64-initialize-FPU.patch
-0003-OvmfPkg-RiscV64-build-BaseRiscVFpuLib.patch
-0001-MdePkg-Fix-overflow-issue-in-BasePeCoffLib.patch
-0002-MdePkg-Improving-readability-of-CVE-patch-for-PeCoff.patch
-0001-Avoid-type-errors-in-EAI-related-name-check-logic.patch
+0001-UefiCpuPkg-Adjust-the-exception-handler-logic-on-Loo.patch
+0002-UefiCpuPkg-Add-dump-interrupt-type-on-LoongArch64.patch
+0003-OvmfPkg-LoongArch-Enabling-some-base-libraries.patch
 0005-Change-build-DEF-to-ENV.patch
